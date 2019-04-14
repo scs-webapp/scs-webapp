@@ -1,0 +1,99 @@
+.Supporter {
+    .Card {
+        max-height: 70vh;
+        overflow: auto;
+
+        .Title {
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .Message {
+            display: flex;
+            margin: .25rem 0;
+
+            .Ours {
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+
+                .Textt {
+                    max-width: 80%;
+                    background-color: #0099FF;
+                    color: #fff;
+                    padding: .5rem .25rem;
+                    border: 1px solid #0099FF;
+                    border-radius: 10px;
+                }
+            }
+
+            .Yours {
+                width: 100%;
+                justify-content: left;
+
+                .Textt {
+                    max-width: 80%;
+                    padding: .5rem .25rem;
+                    border: 1px solid #ccc;
+                    border-radius: 10px;
+                }
+            }
+        }
+
+
+        .Conversation {
+            width: 100%;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+.Text {
+    width: 100%;
+    padding: 1.25rem;
+
+    .FormMessage {
+        margin: .25rem 0;
+        display: flex;
+
+        input {
+
+            width: 80%;
+        }
+
+        .Actions {
+            width: 10%;
+            justify-content: left;
+
+            button {
+                outline: none;
+                border-radius: 10px;
+                height: 100%;
+                display: flex;
+                background: #0099FF;
+                border: 1px solid #0099FF;
+            }
+        }
+
+        .SendIcon {
+            width: 10%;
+            justify-content: flex-end;
+            display: flex;
+
+            button {
+                outline: none;
+                border-radius: 10px;
+                height: 100%;
+                display: flex;
+                background: #0099FF;
+                border: 1px solid #0099FF;
+            }
+        }
+    }
+}
+
+
+html, body, #root {
+    min-height: 100vh;
+    background: #E5E5E5;
+}

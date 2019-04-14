@@ -1,0 +1,49 @@
+@import 'register/index';
+@import 'supporter/index';
+@import 'admin/index.scss';
+
+html, body, #root {
+    min-height: 100vh;
+    background: #f8f8f8;
+}
+
+.Cursor {
+    pointer: cursor;
+}
+
+.MessagesWrapper {
+    max-height: 50vh;
+    overflow: auto;
+
+    .Message {
+        display: flex;
+        margin: .25rem 0;
+
+        .Ours {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+
+            .Textt {
+                max-width: 80%;
+                background-color: #0099FF;
+                color: #fff;
+                padding: .5rem .25rem;
+                border: 1px solid #0099FF;
+                border-radius: 10px;
+            }
+        }
+
+        .Yours {
+            width: 100%;
+            justify-content: left;
+
+            .Textt {
+                max-width: 80%;
+                padding: .5rem .25rem;
+                border: 1px solid #ccc;
+                border-radius: 10px;
+            }
+        }
+    }
+}
