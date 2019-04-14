@@ -12,7 +12,7 @@ import DropdownToggle from 'reactstrap/es/DropdownToggle'
 import DropdownMenu from 'reactstrap/es/DropdownMenu'
 import DropdownItem from 'reactstrap/es/DropdownItem'
 
-const server = 'https://nuichatbot.herokuapp.com'
+const server = process.env.REACT_APP_SERVER
 
 class Supporter extends Component {
     constructor(props) {
@@ -65,16 +65,25 @@ class Supporter extends Component {
         if (conversation.status !== 2 && conversation.status !== 3) return
         if (conversation.group !== userData.group) return
 
-        var isnew = false
-        const newConversations = this.state.conversations.map(c => {
-            if (c.$tid === conversation.$tid) {
-                isnew = true
-                return conversation
-            }
-            return c
+        // delete old conversation
+        const newConversations = this.state.conversations.filter(c => {
+            return c.$tid !== conversation.$tid
         })
+        // add new conversation to top
+        newConversations.unshift(conversation)
+        // sort by time
+        newConversations.sort((a, b) => {
+            if (!a.lastMsg || !b.lastMsg) return 0
+            if (a.lastMsg.time > b.lastMsg.time) {
+                return -1
+            } else if (a.lastMsg.time < b.lastMsg.time) {
+                return 1
+            }
+            return 0
+        })
+
         this.setState(({conversations}) => ({
-            conversations: !isnew ? [conversation, ...conversations] : newConversations
+            conversations: newConversations
         }))
     }
 
@@ -107,7 +116,7 @@ class Supporter extends Component {
         e.preventDefault()
         if (this.state.text) return firebase.auth().currentUser.getIdToken(true).then((idToken) => {
             const {text} = this.state
-            axios.post(`${server}/pagetuyensinh/staffSendMessage`, {
+            axios.post(`https://${server}/pagetuyensinh/staffSendMessage`, {
                 idToken,
                 tid: c.$tid,
                 text
@@ -131,8 +140,9 @@ class Supporter extends Component {
     }
 
     out = () => {
+        if (!window.confirm('Bạn có chắc chắn muốn kết thúc cuộc trò chuyện này?')) return
         firebase.auth().currentUser.getIdToken(true).then((idToken) => {
-            return axios.post(`${server}/pagetuyensinh/staffResetStatus`, {
+            return axios.post(`https://${server}/pagetuyensinh/staffResetStatus`, {
                 idToken,
                 'tid': this.state.open.$tid,
             })
@@ -148,7 +158,7 @@ class Supporter extends Component {
             const c = this.state.open
             console.log('123')
 
-            axios.post(`${server}/pagetuyensinh/staffSendMessage`, {
+            axios.post(`${process.env.REACT_APP_SERVER}/pagetuyensinh/staffSendMessage`, {
                 idToken,
                 tid: c.$tid,
                 text: this.props.user.desc,
@@ -166,7 +176,7 @@ class Supporter extends Component {
         const {current, open, dropdown} = this.state
 
         return <div className={'card mt-3 mb-3'}>
-            <div className={'card-header Title'} onClick={this.onClickConversation(open)}>{this.state.open.name}</div>
+            <div className={'card-header Title'} onClick={this.onClickConversation(open)}><b>↩ Quay lại </b> | {this.state.open.name}</div>
             <div className=" card-body Card" id={'MESSAGES'}>
                 {current.map((m, i) => <div key={i} className={'Message'}>
                     <div className={m.page ? 'Ours' : 'Yours'}>
@@ -209,6 +219,8 @@ class Supporter extends Component {
     () {
         const {user} = this.props
         const {conversations, open} = this.state
+        const bgRead = { 'background-color': '#fff' }
+        const bgUnread = { 'background-color': '#eee' }
 
         return (
             <div className={'Supporter'}>
@@ -221,10 +233,13 @@ class Supporter extends Component {
                     <span className="text-muted">Xin chào,</span><span
                     className={'font-weight-bold'}> {user.name}</span>
                     {open ? this.renderConversation() :
-                        conversations.map((c, i) => <div className={'card card-body mt-3 Card'} key={i}>
-                            <div className={'Title'} onClick={this.onClickConversation(c)}>{c.name}</div>
+                        conversations.map((c, i) => <div className={'card card-body mt-3 Card'} key={i} onClick={this.onClickConversation(c)} style={c.status != 3 ? bgRead : bgUnread}>
+                            { c.status != 3
+                                ? <div className={'Title'}><b>{c.name}</b></div>
+                                : <div className={'Title'}>{c.name}</div>
+                            }
                             <div
-                                className={'text-muted Conversation'}>{c.lastMsg.text}</div>
+                                className={'text-muted Conversation'}>{c.lastMsg.text.substring(0,100)}{c.lastMsg.text.length < 100 ? '' : '...'}</div>
                         </div>)}
                 </div>
             </div>
