@@ -7,6 +7,7 @@
     "@material-ui/core": "^3.9.3",
     "@material-ui/icons": "^3.0.2",
     "axios": "^0.18.0",
+    "cross-env": "^5.2.0",
     "firebase": "^5.9.3",
     "gh-pages": "^2.0.1",
     "moment": "^2.24.0",
@@ -20,8 +21,8 @@
     "reactstrap": "^8.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "cross-env REACT_APP_SERVER=nuichatbot-1.herokuapp.com REACT_APP_DB_PREFIX=z_pagetuyensinh react-scripts start",
+    "build": "cross-env REACT_APP_SERVER=nuichatbot.herokuapp.com REACT_APP_DB_PREFIX=pagetuyensinh react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",

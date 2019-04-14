@@ -22,7 +22,7 @@ const styles = {
     },
 }
 
-const DB_PREFIX = 'pagetuyensinh'
+const DB_PREFIX = process.env.REACT_APP_DB_PREFIX
 
 const config = {
     apiKey: 'AIzaSyBxBvZZPxo06HQWHWudRGytuJoSNw5LNX8',
@@ -90,6 +90,7 @@ class App extends Component {
                             appState: 'register',
                             uid,
                             groups,
+                            isLocked: userData.role === 0
                         })
                     } else {
                         const {role} = userData
@@ -128,6 +129,9 @@ class App extends Component {
                     console.log(err)
                     alert('Có lỗi xảy ra')
                 }
+                this.setState({
+                    isLocked: true
+                })
                 alert('Đăng ký thành công, hãy chờ admin duyệt tài khoản của bạn')
             });
     }
@@ -156,7 +160,7 @@ class App extends Component {
             ...this.props,
             ...this.state,
         }
-        if (appState === 'loading') return <p>loading</p>
+        if (appState === 'loading') return <p><center><br/><br/><img src="https://raw.githubusercontent.com/manh16nd/chon-truong/master/loading.gif" /></center></p>
         if (appState === 'init') return <Init/>
         if (appState === 'register') return <Register {...combinedProps}/>
         if (appState === 'supporter') return <Supporter {...combinedProps}/>
