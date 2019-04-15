@@ -2,7 +2,7 @@
   "name": "scs-react-webapp",
   "version": "0.1.0",
   "private": true,
-  "home-page": "https://manh16nd.github.io/scs-webapp",
+  "home-page": "https://scs-webapp.github.io",
   "dependencies": {
     "@material-ui/core": "^3.9.3",
     "@material-ui/icons": "^3.0.2",
