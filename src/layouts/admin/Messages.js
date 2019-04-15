@@ -17,9 +17,6 @@ class Messages extends Component {
         console.log(currentGroup)
         this.convRef = firebase.database()
             .ref(this.props.DB_PREFIX + '/conversations/group/' + currentGroup)
-            .orderByChild('status')
-            .startAt(2)
-            .endAt(3)
         this.messRef = null
 
         this.state = {
@@ -32,13 +29,16 @@ class Messages extends Component {
         this.convRef.on('child_changed', this.updateConversation)
     }
 
+    componentWillUnmount() {
+        this.convRef.off()
+    }
+
     updateConversation = (snap) => {
         const conversation = snap.val() || {}
         conversation.$tid = snap.key
 
         console.log(conversation)
-        if (conversation.status !== 2 && conversation.status !== 3) return
-        if (conversation.group !== this.props.school) return
+        if (!conversation.psid) return
 
         var isnew = false
         const newConversations = this.state.conversations.map(c => {
@@ -59,9 +59,8 @@ class Messages extends Component {
         })
         this.messRef = firebase.database()
             .ref(this.props.DB_PREFIX + '/conversations/msg/' + this.props.school + '/' + c.$tid)
-            .orderByKey()
-            .limitToLast(20)
 
+        this.setState({current: []})
         this.messRef.on('child_added', this.appendToMessageList)
     }
 
@@ -86,7 +85,10 @@ class Messages extends Component {
                             <Button>
                                 {c.name}
                             </Button>
-                            <Button onClick={() => this.setState({c: null})}>
+                            <Button onClick={() => {
+                                this.messRef.off()
+                                this.setState({c: null})
+                            }}>
                                 Quay lại
                             </Button>
                         </div>
@@ -102,7 +104,7 @@ class Messages extends Component {
                         {this.state.conversations.map((c, i) => <ListItem key={i}>
                             <ListItemText
                                 primary={c.name}
-                                secondary={`Tư vấn viên: ${c.answeredBy} - ${c.lastMsg ? 'Tin nhắn cuối: ' + moment(c.lastMsg.time).format('MMMM Do YYYY, h:mm:ss a') : ''}`}
+                                secondary={`Tư vấn viên: ${c.answeredBy} - ${c.lastMsg ? 'Tin nhắn cuối: ' + moment(c.lastMsg.time).format('MMMM Do YYYY, h:mm:ss a') : ''} ${c.state < 2 ? ' (Đã kết thúc)' : ''}`}
                             />
 
                             <ListItemSecondaryAction>
