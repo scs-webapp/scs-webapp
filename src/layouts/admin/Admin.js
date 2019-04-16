@@ -39,12 +39,16 @@ class Admin extends Component {
             search: '',
         }
 
-        firebase.database().ref(this.props.DB_PREFIX + '/groups').once('value').then(snap => {
+        this.ref = firebase.database().ref(this.props.DB_PREFIX + '/groups').on('value', snap => {
             var schools = snap.val()
             Object.keys(schools).forEach(code => {
                 this.updateSchool(code, schools[code])
             })
         })
+    }
+
+    componentWillUnmount() {
+        this.ref.off()
     }
 
     updateSchool = (code, data) => {

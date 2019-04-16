@@ -32,13 +32,12 @@ class NewSchool extends Component {
         const {form} = this.state
         const {school} = this.props
         if (school[form.key]) alert('Mã trường trùng lặp')
-        firebase.database().ref(this.props.DB_PREFIX + '/groups').set({
-            ...school,
-            [form.key]: {
+        firebase.database().ref(this.props.DB_PREFIX + '/groups/' + form.key).set(
+            {
                 name: form.name,
                 khoi: form.khoi,
             }
-        }).then(() => {
+        ).then(() => {
             this.setState({
                 form: {
                     name: '',
