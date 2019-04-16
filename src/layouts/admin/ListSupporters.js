@@ -83,16 +83,6 @@ class ListSupporters extends Component {
             })
     }
 
-    changeSwitch = (e) => {
-        const value = e.target.checked ? 500 : 0
-        this.setState(({editUser}) => ({
-            editUser: {
-                ...editUser,
-                role: value,
-            }
-        }))
-    }
-
     render() {
         const {users, editUser} = this.state
 
@@ -130,9 +120,12 @@ class ListSupporters extends Component {
                             onChange={this.changeRadio('role')}
                             value={editUser ? editUser.role : null}
                         >
-                            <FormControlLabel value={500} control={<Radio/>} label="Tư vấn viên"/>
-                            <FormControlLabel value={800} control={<Radio/>} label="Biên tập viên"/>
-                            <FormControlLabel value={0} control={<Radio/>} label="Hủy kích hoạt"/>
+                            <FormControlLabel value={500} control={<Radio
+                                color={'primary'}/>} label="Tư vấn viên"/>
+                            <FormControlLabel value={800} control={<Radio
+                                color={'primary'}/>} label="Biên tập viên"/>
+                            <FormControlLabel value={0} control={<Radio
+                                color={'primary'}/>} label="Hủy kích hoạt"/>
                         </RadioGroup>
                         <TextField
                             autoFocus
