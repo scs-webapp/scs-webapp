@@ -11,6 +11,12 @@ import ButtonDropdown from 'reactstrap/es/ButtonDropdown'
 import DropdownToggle from 'reactstrap/es/DropdownToggle'
 import DropdownMenu from 'reactstrap/es/DropdownMenu'
 import DropdownItem from 'reactstrap/es/DropdownItem'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
 
 const server = process.env.REACT_APP_SERVER
 
@@ -215,10 +221,40 @@ class Supporter extends Component {
         </div>
     }
 
+    editUser = (user) => () => {
+        this.setState({
+            editUser: user ? {...user} : null,
+        })
+    }
+
+    changeInput = (key) => (e) => {
+        const {value} = e.target
+
+        this.setState(({editUser}) => ({
+            editUser: {
+                ...editUser,
+                [key]: value,
+            }
+        }))
+    }
+
+    handleSaveUser = () => {
+        const {editUser} = this.state
+        firebase.database().ref(this.props.DB_PREFIX + '/users/' + editUser.$uid).set(
+            this.props.removeTempKeys(editUser)
+            , (err) => {
+                if (!err) {
+                    console.log(123)
+                    return this.editUser()()
+                }
+                alert(err)
+            })
+    }
+
     render
     () {
         const {user} = this.props
-        const {conversations, open} = this.state
+        const {conversations, open, editUser} = this.state
         const bgRead = { 'background-color': '#fff' }
         const bgUnread = { 'background-color': '#eee' }
 
@@ -230,11 +266,13 @@ class Supporter extends Component {
                     </Toolbar>
                 </AppBar>
                 <div className={'container mt-3'}>
-                    <span className="text-muted">Xin chào,</span><span
-                    className={'font-weight-bold'}> {user.name}</span>
+                    <span className="text-muted">Xin chào,</span>
+                    <span className={'font-weight-bold'}> {user.name}</span>
+                    <Button onClick={this.editUser(user)} color="primary">Sửa lời chào</Button>
+
                     {open ? this.renderConversation() :
-                        conversations.map((c, i) => <div className={'card card-body mt-3 Card'} key={i} onClick={this.onClickConversation(c)} style={c.status != 3 ? bgRead : bgUnread}>
-                            { c.status != 3
+                        conversations.map((c, i) => <div className={'card card-body mt-3 Card'} key={i} onClick={this.onClickConversation(c)} style={c.status !== 3 ? bgRead : bgUnread}>
+                            { c.status !== 3
                                 ? <div className={'Title'}><b>{c.name}</b></div>
                                 : <div className={'Title'}>{c.name}</div>
                             }
@@ -242,6 +280,33 @@ class Supporter extends Component {
                                 className={'text-muted Conversation'}>{c.lastMsg.text.substring(0,100)}{c.lastMsg.text.length < 100 ? '' : '...'}</div>
                         </div>)}
                 </div>
+
+                <Dialog
+                    open={editUser}
+                    onClose={this.editUser(null)}
+                    aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Sửa lời chào</DialogTitle>
+                    <DialogContent>
+                        <p>Tự giới thiệu (là tin nhắn sẽ gửi để giới thiệu bản thân khi bạn bắt đầu trả lời tin nhắn)</p>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="desc"
+                            onChange={this.changeInput('desc')}
+                            placeholder="VD: Xin chào em, anh/chị tên là ABC, học ở lớp DEF trường XYZ"
+                            value={editUser ? editUser.desc : ''}
+                            fullWidth
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.editUser(null)} color="primary">
+                            Hủy
+                        </Button>
+                        <Button variant="contained" onClick={this.handleSaveUser} color="primary">
+                            Sửa thông tin
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </div>
         )
     }

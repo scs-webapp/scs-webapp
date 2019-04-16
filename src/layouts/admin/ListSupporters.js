@@ -25,10 +25,14 @@ class ListSupporters extends Component {
         this.state = {
             users: []
         }
-        firebase.database().ref(this.props.DB_PREFIX + '/users')
+        this.ref = firebase.database().ref(this.props.DB_PREFIX + '/users')
             .orderByChild('group')
             .equalTo(this.props.school)
-            .once('value').then(snap => this.updateUsers(snap))
+        this.ref.on('value', snap => this.updateUsers(snap))
+    }
+
+    componentWillUnmount() {
+        this.ref.off()
     }
 
     updateUsers = (snap) => {
@@ -92,8 +96,7 @@ class ListSupporters extends Component {
                             <FolderIcon/>
                         </ListItemIcon>
                         <ListItemText
-                            primary={user.name}
-                            secondary={user.role ? null : <span className={'text-muted'}>Chưa kích hoạt</span>}
+                            primary={user.role ? user.name : <span>{user.name} - <span className={'text-muted'}>Chưa kích hoạt</span></span>}
                         />
                         <ListItemSecondaryAction>
                             <IconButton aria-label="Delete" onClick={this.editUser(user)}>

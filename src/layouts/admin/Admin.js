@@ -33,21 +33,31 @@ class Admin extends Component {
     constructor(props) {
         super(props)
 
-        this.schoolRef = firebase.database().ref(this.props.DB_PREFIX + '/groups')
-        this.schoolRef.on('child_added', this.updateSchool)
-        this.schoolRef.on('child_changed', this.updateSchool)
         this.state = {
             school: {},
             addNewSchool: false,
             search: '',
         }
+
+        this.ref = firebase.database().ref(this.props.DB_PREFIX + '/groups').on('value', snap => {
+            var schools = snap.val()
+            Object.keys(schools).forEach(code => {
+                this.updateSchool(code, schools[code])
+            })
+        })
     }
 
-    updateSchool = (snap) => {
+    componentWillUnmount() {
+        this.ref.off()
+    }
+
+    updateSchool = (code, data) => {
+        if (this.props.user.role != 1000
+            && code != this.props.user.group) return
         this.setState(({ school }) => ({
             school: {
                 ...school,
-                [snap.key]: snap.val(),
+                [code]: data,
             }
         }))
     }
@@ -85,6 +95,10 @@ class Admin extends Component {
 
     render() {
         const { school, selectedSchool, addNewSchool, messages, editSchool } = this.state
+        const { user } = this.props
+        const showIfAdmin = {
+            'display': user.role == 1000 ? 'inherit' : 'none'
+        }
 
         return (
             <div className="Admin">
@@ -95,7 +109,7 @@ class Admin extends Component {
                 </AppBar>
                 <div className={'container mt-3'}>
 
-                    <Button variant="contained" color="primary" onClick={this._addNewSchool}>
+                    <Button variant="contained" color="primary" onClick={this._addNewSchool} style={showIfAdmin}>
                         Thêm trường
                     </Button>
                     <br />
@@ -106,6 +120,7 @@ class Admin extends Component {
                         variant='outlined'
                         fullWidth
                         value={this.state.search}
+                        style={showIfAdmin}
                         onChange={(e) => {
                             const { value } = e.target
                             this.setState({ search: value })
@@ -181,6 +196,7 @@ class Admin extends Component {
                                         Quản lý tư vấn viên
                             </Button>
                                     <Button
+                                        style={showIfAdmin}
                                         onClick={this.editSchool(s, school[s])}
                                     >
                                         Sửa thông tin trường

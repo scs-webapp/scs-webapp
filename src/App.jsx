@@ -95,7 +95,7 @@ class App extends Component {
                     } else {
                         const {role} = userData
                         this.setState({
-                            appState: role === 1000 ? 'admin' : 'supporter',
+                            appState: role >= 800 ? 'admin' : 'supporter',
                             user: userData,
                         })
                     }

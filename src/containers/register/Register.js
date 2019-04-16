@@ -29,7 +29,7 @@ class Register extends Component {
 
     _onSubmit = async  () => {
         const {form} = this.state
-        if (form.email && form.name && form.group) {
+        if (form.email && form.name && form.group && form.name.length > 10) {
             this.setState({
                 loading: true,
             })
@@ -98,10 +98,11 @@ class Register extends Component {
                             {/*onChange={this._onChangeInput('group')}*/}
                             {/*autoComplete={'off'}*/}
                         {/*/>*/}
-                        <label htmlFor={'desc'}>Lời chào</label>
+                        <label htmlFor={'desc'}>Lời chào (là tin nhắn sẽ gửi để giới thiệu bản thân khi bạn bắt đầu trả lời tin nhắn)</label>
                         <input
                             className={'form-control'}
                             value={form.desc}
+                            placeholder="VD: Xin chào em, anh/chị tên là ABC, học ở lớp DEF trường XYZ"
                             id={'desc'}
                             autoComplete={'off'}
                             onChange={this._onChangeInput('desc')}
