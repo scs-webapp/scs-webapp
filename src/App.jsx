@@ -7,7 +7,6 @@ import Register from './containers/register/Register'
 import Init from './containers/init/Init'
 import Supporter from './layouts/supporter/Supporter'
 import Admin from './layouts/admin/Admin'
-import NewUser from './containers/new-user/NewUser'
 
 const styles = {
     root: {
@@ -115,7 +114,7 @@ class App extends Component {
             email, password
         ).then(() => {
             this._doLogin()
-        }).catch((e) => {
+        }).catch(() => {
             alert('Có lỗi xảy ra, vui lòng báo lại với admin')
         })
     }
@@ -160,7 +159,10 @@ class App extends Component {
             ...this.props,
             ...this.state,
         }
-        if (appState === 'loading') return <p><center><br/><br/><img src="https://raw.githubusercontent.com/manh16nd/chon-truong/master/loading.gif" /></center></p>
+        if (appState === 'loading') return <p>
+            <center><br/><br/><img src="https://raw.githubusercontent.com/manh16nd/chon-truong/master/loading.gif"
+                                   alt="Loading"/></center>
+        </p>
         if (appState === 'init') return <Init/>
         if (appState === 'register') return <Register {...combinedProps}/>
         if (appState === 'supporter') return <Supporter {...combinedProps}/>
