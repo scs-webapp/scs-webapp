@@ -14,9 +14,10 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import FolderIcon from '@material-ui/icons/AccountCircle'
 import DeleteIcon from '@material-ui/icons/Create'
 import * as firebase from 'firebase'
-import Switch from '@material-ui/core/Switch'
 import AppContext from '../../AppContext'
 import Button from '@material-ui/core/Button'
+import Radio from '@material-ui/core/Radio'
+import RadioGroup from '@material-ui/core/RadioGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 
 class ListSupporters extends Component {
@@ -54,6 +55,17 @@ class ListSupporters extends Component {
             editUser: {
                 ...editUser,
                 [key]: value,
+            }
+        }))
+    }
+
+    changeRadio = (key) => (e) => {
+        const {value} = e.target
+
+        this.setState(({editUser}) => ({
+            editUser: {
+                ...editUser,
+                [key]: Number(value),
             }
         }))
     }
@@ -96,7 +108,8 @@ class ListSupporters extends Component {
                             <FolderIcon/>
                         </ListItemIcon>
                         <ListItemText
-                            primary={user.role ? user.name : <span>{user.name} - <span className={'text-muted'}>Chưa kích hoạt</span></span>}
+                            primary={user.role ? user.name :
+                                <span>{user.name} - <span className={'text-muted'}>Chưa kích hoạt</span></span>}
                         />
                         <ListItemSecondaryAction>
                             <IconButton aria-label="Delete" onClick={this.editUser(user)}>
@@ -112,16 +125,15 @@ class ListSupporters extends Component {
                 >
                     <DialogTitle id="form-dialog-title">Sửa thông tin tư vấn viên</DialogTitle>
                     <DialogContent>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={editUser ? editUser.role === 500 : false}
-                                    onChange={this.changeSwitch}
-                                    color="primary"
-                                />
-                            }
-                            label="Kích hoạt tài khoản"
-                        />
+                        <RadioGroup
+                            aria-label={'role'}
+                            onChange={this.changeRadio('role')}
+                            value={editUser ? editUser.role : null}
+                        >
+                            <FormControlLabel value={500} control={<Radio/>} label="Tư vấn viên"/>
+                            <FormControlLabel value={800} control={<Radio/>} label="Biên tập viên"/>
+                            <FormControlLabel value={0} control={<Radio/>} label="Hủy kích hoạt"/>
+                        </RadioGroup>
                         <TextField
                             autoFocus
                             margin="dense"
