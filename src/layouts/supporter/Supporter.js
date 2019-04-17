@@ -17,6 +17,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
+import {urlify} from '../../helpers/text'
 
 const server = process.env.REACT_APP_SERVER
 
@@ -120,23 +121,25 @@ class Supporter extends Component {
 
     _onSubmit = (c) => (e) => {
         e.preventDefault()
-        if (this.state.text) return firebase.auth().currentUser.getIdToken(true).then((idToken) => {
-            const {text} = this.state
-            axios.post(`https://${server}/pagetuyensinh/staffSendMessage`, {
-                idToken,
-                tid: c.$tid,
-                text
+        if (this.state.text) {
+            const t = this.state.text
+            this.setState({
+                text: '',
             })
-                .then(resp => {
-                    const {data} = resp
-                    if (data.error) return alert(data.error)
-                    this.setState({
-                        text: '',
-                    })
+            return firebase.auth().currentUser.getIdToken(true).then((idToken) => {
+                axios.post(`https://${server}/pagetuyensinh/staffSendMessage`, {
+                    idToken,
+                    tid: c.$tid,
+                    text: t
                 })
-                .catch(err => alert(err.message || err))
-        })
-            .catch(e => alert(e.message || e))
+                    .then(resp => {
+                        const {data} = resp
+                        if (data.error) return alert(data.error)
+                    })
+                    .catch(err => alert(err.message || err))
+            })
+                .catch(e => alert(e.message || e))
+        }
     }
 
     toggle = () => {
@@ -178,15 +181,34 @@ class Supporter extends Component {
             .catch(e => alert(e.message || e))
     }
 
+    renderMessage = (message) => {
+        if (message.startsWith('$image')) {
+            const image_urls = message.split('|')
+            image_urls.shift()
+            return <div className={'ImageWrapper'}>{image_urls.map((image, i) => <div
+                key={i}
+                className="ImageMessage"
+                style={{
+                    backgroundImage: `url(${image})`,
+                    backgroundSize: 'cover',
+                }}
+                onClick={() => window.open(image, '_blank')}
+            />)}
+            </div>
+        }
+        return <div dangerouslySetInnerHTML={{__html: urlify(message)}}/>
+    }
+
     renderConversation = () => {
         const {current, open, dropdown} = this.state
 
         return <div className={'card mt-3 mb-3'}>
-            <div className={'card-header Title'} onClick={this.onClickConversation(open)}><b>↩ Quay lại </b> | {this.state.open.name}</div>
+            <div className={'card-header Title'} onClick={this.onClickConversation(open)}><b>↩ Quay
+                lại </b> | {this.state.open.name}</div>
             <div className=" card-body Card" id={'MESSAGES'}>
                 {current.map((m, i) => <div key={i} className={'Message'}>
                     <div className={m.page ? 'Ours' : 'Yours'}>
-                        <div className={'Textt'}>{m.text}</div>
+                        <div className={'Textt'}>{this.renderMessage(m.text)}</div>
                     </div>
                 </div>)}
             </div>
@@ -251,12 +273,11 @@ class Supporter extends Component {
             })
     }
 
-    render
-    () {
+    render() {
         const {user} = this.props
         const {conversations, open, editUser} = this.state
-        const bgRead = { 'background-color': '#fff' }
-        const bgUnread = { 'background-color': '#eee' }
+        const bgRead = {'background-color': '#fff'}
+        const bgUnread = {'background-color': '#eee'}
 
         return (
             <div className={'Supporter'}>
@@ -271,13 +292,15 @@ class Supporter extends Component {
                     <Button onClick={this.editUser(user)} color="primary">Sửa lời chào</Button>
 
                     {open ? this.renderConversation() :
-                        conversations.map((c, i) => <div className={'card card-body mt-3 Card'} key={i} onClick={this.onClickConversation(c)} style={c.status !== 3 ? bgRead : bgUnread}>
-                            { c.status !== 3
+                        conversations.map((c, i) => <div className={'card card-body mt-3 Card'} key={i}
+                                                         onClick={this.onClickConversation(c)}
+                                                         style={c.status !== 3 ? bgRead : bgUnread}>
+                            {c.status !== 3
                                 ? <div className={'Title'}><b>{c.name}</b></div>
                                 : <div className={'Title'}>{c.name}</div>
                             }
                             <div
-                                className={'text-muted Conversation'}>{c.lastMsg.text.substring(0,100)}{c.lastMsg.text.length < 100 ? '' : '...'}</div>
+                                className={'text-muted Conversation'}>{c.lastMsg.text.substring(0, 100)}{c.lastMsg.text.length < 100 ? '' : '...'}</div>
                         </div>)}
                 </div>
 
@@ -287,7 +310,8 @@ class Supporter extends Component {
                     aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Sửa lời chào</DialogTitle>
                     <DialogContent>
-                        <p>Tự giới thiệu (là tin nhắn sẽ gửi để giới thiệu bản thân khi bạn bắt đầu trả lời tin nhắn)</p>
+                        <p>Tự giới thiệu (là tin nhắn sẽ gửi để giới thiệu bản thân khi bạn bắt đầu trả lời tin
+                            nhắn)</p>
                         <TextField
                             autoFocus
                             margin="dense"

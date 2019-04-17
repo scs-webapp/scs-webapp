@@ -91,12 +91,6 @@ class Register extends Component {
                                 {this.props.groups[g].name}
                             </option>)}
                         </select>
-                        {/*<input*/}
-                            {/*className={'form-control'}*/}
-                            {/*value={form.group}*/}
-                            {/*id={'group'}*/}
-                            {/*onChange={this._onChangeInput('group')}*/}
-                            {/*autoComplete={'off'}*/}
                         {/*/>*/}
                         <label htmlFor={'desc'}>Lời chào (là tin nhắn sẽ gửi để giới thiệu bản thân khi bạn bắt đầu trả lời tin nhắn)</label>
                         <input
